@@ -20,8 +20,15 @@ public class StoreController {
     }
 
     @GetMapping(path = "/stores/{id}")
-    public Store getStation(@PathVariable int id) throws ModelNotFoundException {
-        return storeService.getById(id);
+    public ResponseEntity<? extends Object> getStation(@PathVariable int id) throws ModelNotFoundException {
+        try {
+            return ResponseEntity.ok().body(storeService.getById(id));
+        }
+        catch (ModelNotFoundException e) {
+            HashMap<String, String> returnBody = new HashMap<String, String>();
+            returnBody.put("message", "Unknown store id");
+            return ResponseEntity.badRequest().body(returnBody);
+        }
     }
 
     @PostMapping(path = "/stores")
@@ -32,9 +39,9 @@ public class StoreController {
                     .body(createdStore);
         }
         catch(StoreNameCannotBeEmptyException e) {
-            Map<String, String> errorMsg = new HashMap<>();
-            errorMsg.put("msg", "name cannot be empty");
-            return ResponseEntity.status(400).body(errorMsg);
+            Map<String, String> returnBody = new HashMap<>();
+            returnBody.put("msg", "name cannot be empty");
+            return ResponseEntity.status(400).body(returnBody);
         }
     }
 }
